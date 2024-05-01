@@ -1,0 +1,26 @@
+name: Setup Virtual Container
+description: >
+  Set up a Linux container to use in workflow steps. Because the container is run inside a virtualized
+  Alpine Linux distribution provided by jirutka/setup-alpine, the container can run on a different
+  CPU architecture.
+author: Sander Vocke
+
+inputs:
+  container:
+    description: >
+      URL of the container to use. It will be started using Podman.
+    required: true
+  arch:
+    description: >
+      CPU architecture to use.
+
+runs:
+  using: composite
+  steps:
+    - name: Setup virtual container
+      uses: jirutka/setup-alpine@v1
+      with:
+        arch: ${{ inputs.arch }}
+        packages: podman
+
+        

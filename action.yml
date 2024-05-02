@@ -28,6 +28,8 @@ runs:
     - name: Setup
       shell: bash
       run: |
+        pwd
+        ls -la
         sudo -E ./setup.sh
       working-directory: ${{ github.action_path }}
     - name: Run container

@@ -32,10 +32,9 @@ runs:
         ls -la
         sudo -E ./setup.sh
       working-directory: ${{ github.action_path }}
-    - name: Run container
-      uses: JarvusInnovations/background-action@v1
-      with:
-        run: |
+    - name: Set up command
+      shell: bash
+      run: |
          ARGS=""
          if [ ! -z "${{ inputs.arch }}" ]; then
            ARGS="$ARGS --arch ${{ inputs.arch }}"
@@ -43,8 +42,11 @@ runs:
          ARGS="$ARGS ${{ inputs.podman_args }}"
          CMD="podman run $ARGS --cidfile ${{ github.action_path }}/container_cid ${{ inputs.container }} /bin/sh -c 'sleep 100'"
          echo "Full podman command: $CMD"
-         $CMD
-
+         echo "PODMAN_CMD=$CMD" >> $GITHUB_ENV
+    - name: Run container
+      uses: JarvusInnovations/background-action@v1
+      with:
+        run: ${{ github.env.PODMAN_CMD }}
         wait-on: ${{ github.action_path }}/container_cid
         wait-for: 5m
     - name: Get CID

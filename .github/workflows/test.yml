@@ -29,9 +29,13 @@ jobs:
       uses: actions/checkout@v3
       with:
         submodules: recursive
-    - name: Try
+    - name: Start container
       uses: ./
       with:
         container: ${{ matrix.job.container }}
         arch: ${{ matrix.job.arch }}
         podman_args: ${{ matrix.args }}
+    - name: Print arch from within container
+      shell: run_in_container.sh {0}
+      run: |
+        echo "Arch in container: $(uname -m)"

@@ -25,6 +25,12 @@ runs:
       uses: ConorMacBride/install-package@v1
       with:
         apt: podman qemu qemu-user-static
+    - name: Install wrapper script
+      shell: bash
+      run: |
+        readonly SCRIPT_PATH=$(readlink -f "$0")
+        readonly SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+        install -Dv -m755 "$SCRIPT_DIR"/run_in_container.sh abin/run_in_container.sh
     - name: Run container
       shell: bash
       run: |
@@ -33,6 +39,8 @@ runs:
            ARGS="$ARGS --arch ${{ inputs.arch }}"
          fi
          ARGS="$ARGS ${{ inputs.podman_args }}"
-         CMD="podman run $ARGS ${{ inputs.container }} uname -m"
+         CMD="podman run -d $ARGS ${{ inputs.container }}"
          echo "Full podman command: $CMD"
-         $CMD
+         CONTAINER=$($CMD)
+         echo "Container ID: $CONTAINER"
+         echo "__RUNNING_CONTAINER=$CONTAINER" >> $GITHUB_ENV

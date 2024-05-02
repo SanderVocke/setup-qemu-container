@@ -2,9 +2,9 @@ name: Test
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 permissions:
@@ -16,14 +16,35 @@ jobs:
   test:
     strategy:
       fail-fast: false
+      matrix:
+        job:
+          - arch: aarch64
+            container: quay.io/pypa/manylinux_2_28_aarch64
+          - arch: arm
+            container: alpine
+        args:
+          [ null, '--privileged' ]
+          
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v3
       with:
         submodules: recursive
-    - name: Try
+    - name: Start container
       uses: ./
       with:
-        container: archlinux
-        arch: x86_64
+        container: ${{ matrix.job.container }}
+        arch: ${{ matrix.job.arch }}
+        podman_args: ${{ matrix.args }}
+    - name: Inspect container
+      shell: bash
+      run: podman inspect $__RUNNING_CONTAINER
+    - name: Print arch from within container
+      shell: run_in_container.sh {0}
+      run: |
+        echo "Arch in container: $(uname -m)"
+    - name: Print arch from within container with explicit shell
+      shell: run_in_container.sh --shell sh {0}
+      run: |
+        echo "Arch in container: $(uname -m)"

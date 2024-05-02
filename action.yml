@@ -13,19 +13,46 @@ inputs:
   arch:
     description: >
       CPU architecture to use.
+    default: x86_64
+  podman_args:
+    description: >
+      Additional arguments to podman.
 
 runs:
   using: composite
   steps:
-    - name: Setup virtual container
-      uses: jirutka/setup-alpine@v1
+    - name: Install packages
+      uses: ConorMacBride/install-package@v1
       with:
-        arch: ${{ inputs.arch }}
-        packages: podman
-    - name: Start container process
+        apt: podman qemu qemu-user-static
+    - name: Setup
+      shell: bash
+      run: |
+        pwd
+        ls -la
+        sudo -E ./setup.sh
+      working-directory: ${{ github.action_path }}
+    - name: Set up command
+      shell: bash
+      run: |
+         ARGS=""
+         if [ ! -z "${{ inputs.arch }}" ]; then
+           ARGS="$ARGS --arch ${{ inputs.arch }}"
+         fi
+         ARGS="$ARGS ${{ inputs.podman_args }}"
+         CMD="podman run $ARGS --cidfile ${{ github.action_path }}/container_cid ${{ inputs.container }} tail -f /dev/null"
+         echo "Full podman command: $CMD"
+         echo "PODMAN_CMD=$CMD" >> $GITHUB_ENV
+    - name: Run container
       uses: JarvusInnovations/background-action@v1
       with:
-        run: alpine.sh <(podman run ${{ inputs.container }})
+        run: $PODMAN_CMD
+        wait-on: ${{ github.action_path }}/container_cid
         wait-for: 5m
-        log-output: true
-      
+        log-output-resume: true
+    - name: Get CID
+      shell: bash
+      run: |
+        CID=$(cat ${{ github.action_path }}/container_cid)
+        echo "__RUNNING_CONTAINER=$CID" >> $GITHUB_ENV
+        echo "Container CID: $CID"

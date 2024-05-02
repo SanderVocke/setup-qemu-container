@@ -26,7 +26,7 @@ runs:
         packages: podman
     - name: Start container process
       if: ${{ inputs.container }}
-      shell: alpine.sh {0}
+      shell: alpine.sh --root {0}
       run: podman run ${{ inputs.container }}
     # - name: Start container process
     #   if: ${{ inputs.container }}

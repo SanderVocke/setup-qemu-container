@@ -26,10 +26,14 @@ runs:
         packages: podman
     - name: Start container process
       if: ${{ inputs.container }}
-      uses: JarvusInnovations/background-action@v1
-      with:
-        run: alpine.sh <(podman run ${{ inputs.container }}) && touch container_started
-        wait-on: container_started
-        wait-for: 5m
-        log-output: true
+      run: |
+        alpine.sh <(podman run ${{ inputs.container }})
+    # - name: Start container process
+    #   if: ${{ inputs.container }}
+    #   uses: JarvusInnovations/background-action@v1
+    #   with:
+    #     run: alpine.sh <(podman run ${{ inputs.container }}) && touch container_started
+    #     wait-on: container_started
+    #     wait-for: 5m
+    #     log-output: true
       

@@ -49,6 +49,7 @@ runs:
         run: ${{ github.env.PODMAN_CMD }}
         wait-on: ${{ github.action_path }}/container_cid
         wait-for: 5m
+        log-output-resume: true
     - name: Get CID
       shell: bash
       run: |

@@ -10,9 +10,11 @@ inputs:
     description: >
       URL of the container to use. It will be started using Podman.
     required: true
+    default: null
   arch:
     description: >
       CPU architecture to use.
+    default: x86_64
 
 runs:
   using: composite
@@ -23,9 +25,11 @@ runs:
         arch: ${{ inputs.arch }}
         packages: podman
     - name: Start container process
+      if: ${{ inputs.container }}
       uses: JarvusInnovations/background-action@v1
       with:
-        run: alpine.sh <(podman run ${{ inputs.container }})
+        run: alpine.sh <(podman run ${{ inputs.container }}) && touch container_started
+        wait-on: container_started
         wait-for: 5m
         log-output: true
       

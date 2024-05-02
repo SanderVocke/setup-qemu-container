@@ -10,11 +10,13 @@ inputs:
     description: >
       URL of the container to use. It will be started using Podman.
     required: true
-    default: null
   arch:
     description: >
       CPU architecture to use.
     default: x86_64
+  podman_args:
+    description: >
+      Additional arguments to podman.
 
 runs:
   using: composite
@@ -26,4 +28,9 @@ runs:
     - name: Run container
       shell: bash
       run: |
-         podman run --arch aarch64 --privileged=true quay.io/pypa/manylinux_2_28_aarch64 uname -m
+         ARGS=""
+         if [ ! -z "${{ inputs.arch }}" ]; then
+           ARGS="$ARGS --arch ${{ inputs.arch }}"
+         fi
+         ARGS="$ARGS ${{ inputs.podman_args }}"
+         podman run $ARGS ${{ inputs.container }} uname -m

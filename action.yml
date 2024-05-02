@@ -33,4 +33,6 @@ runs:
            ARGS="$ARGS --arch ${{ inputs.arch }}"
          fi
          ARGS="$ARGS ${{ inputs.podman_args }}"
-         podman run $ARGS ${{ inputs.container }} uname -m
+         CMD="podman run $ARGS ${{ inputs.container }} uname -m"
+         echo "Full podman command: $CMD"
+         $CMD

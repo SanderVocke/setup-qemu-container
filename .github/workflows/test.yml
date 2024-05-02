@@ -16,6 +16,13 @@ jobs:
   test:
     strategy:
       fail-fast: false
+      matrix:
+        job:
+          - arch: aarch64
+            container: quay.io/pypa/manylinux_2_28_aarch64
+        args:
+          [ null, '--privileged' ]
+          
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -25,6 +32,6 @@ jobs:
     - name: Try
       uses: ./
       with:
-        container: quay.io/pypa/manylinux_2_28_aarch64
-        arch: aarch64
-        podman_args: --privileged
+        container: ${{ matrix.job.container }}
+        arch: ${{ matrix.job.arch }}
+        podman_args: ${{ matrix.args }}

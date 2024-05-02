@@ -40,24 +40,24 @@ runs:
            ARGS="$ARGS --arch ${{ inputs.arch }}"
          fi
          ARGS="$ARGS ${{ inputs.podman_args }}"
-         CMD="podman run $ARGS --cidfile ${{ github.action_path }}/container_cid ${{ inputs.container }} sleep 20"
+         CMD="podman run $ARGS --cidfile ${{ github.action_path }}/container_cid ${{ inputs.container }} /bin/sh"
          echo "Full podman command: $CMD"
          echo "PODMAN_CMD=$CMD" >> $GITHUB_ENV
-    - name: Run container
-      shell: bash
-      run: |
-        echo "Running: $PODMAN_CMD"
-        $PODMAN_CMD
     # - name: Run container
-    #   uses: JarvusInnovations/background-action@v1
-    #   with:
-    #     run: ${{ github.env.PODMAN_CMD }}
-    #     wait-on: ${{ github.action_path }}/container_cid
-    #     wait-for: 5m
-    #     log-output-resume: true
-    # - name: Get CID
     #   shell: bash
     #   run: |
-    #     CID=$(cat ${{ github.action_path }}/container_cid)
-    #     echo "__RUNNING_CONTAINER=$CID" >> $GITHUB_ENV
-    #     echo "Container CID: $CID"
+    #     echo "Running: $PODMAN_CMD"
+    #     $PODMAN_CMD
+    - name: Run container
+      uses: JarvusInnovations/background-action@v1
+      with:
+        run: $PODMAN_CMD
+        wait-on: ${{ github.action_path }}/container_cid
+        wait-for: 5m
+        log-output-resume: true
+    - name: Get CID
+      shell: bash
+      run: |
+        CID=$(cat ${{ github.action_path }}/container_cid)
+        echo "__RUNNING_CONTAINER=$CID" >> $GITHUB_ENV
+        echo "Container CID: $CID"

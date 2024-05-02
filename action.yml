@@ -41,8 +41,7 @@ runs:
            ARGS="$ARGS --arch ${{ inputs.arch }}"
          fi
          ARGS="$ARGS ${{ inputs.podman_args }}"
-         CIDFILE="${{ github.action_path }}/container_cid"
-         CMD="nohup podman run $ARGS --cidfile $CIDFILE ${{ inputs.container }}"
+         CMD="nohup podman run $ARGS --cidfile ${{ github.action_path }}/container_cid ${{ inputs.container }}"
          echo "Full podman command: $CMD"
          $CMD
 

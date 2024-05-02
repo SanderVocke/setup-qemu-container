@@ -25,12 +25,11 @@ runs:
       uses: ConorMacBride/install-package@v1
       with:
         apt: podman qemu qemu-user-static
-    - name: Install wrapper script
+    - name: Setup
       shell: bash
       run: |
-        readonly SCRIPT_PATH=$(readlink -f "$0")
-        readonly SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
-        install -Dv -m755 "$SCRIPT_DIR"/run_in_container.sh abin/run_in_container.sh
+        sudo -E ./setup.sh
+      working-directory: ${{ github.action_path }}
     - name: Run container
       shell: bash
       run: |

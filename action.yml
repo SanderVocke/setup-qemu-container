@@ -27,7 +27,7 @@ runs:
     - name: Start container process
       if: ${{ inputs.container }}
       shell: alpine.sh --root {0}
-      run: podman run ${{ inputs.container }}
+      run: XDG_RUNTIME_DIR="" podman run ${{ inputs.container }}
     # - name: Start container process
     #   if: ${{ inputs.container }}
     #   uses: JarvusInnovations/background-action@v1

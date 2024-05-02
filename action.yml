@@ -28,8 +28,9 @@ runs:
       if: ${{ inputs.container }}
       shell: alpine.sh --root {0}
       run: |
-         findmnt -l
          XDG_RUNTIME_DIR="" podman info --debug
+         mount --bind / /
+         findmnt -l
          XDG_RUNTIME_DIR="" podman run ${{ inputs.container }}
     # - name: Start container process
     #   if: ${{ inputs.container }}

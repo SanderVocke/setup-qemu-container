@@ -22,5 +22,10 @@ runs:
       with:
         arch: ${{ inputs.arch }}
         packages: podman
-
-        
+    - name: Start container process
+      uses: JarvusInnovations/background-action@v1
+      with:
+        run: alpine.sh <(podman run ${{ inputs.container }})
+        wait-for: 5m
+        log-output: true
+      

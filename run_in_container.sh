@@ -5,8 +5,8 @@ case "$1" in
 	--shell) shell=$2; shift; shift;;
 esac
 
-if [ -f $2 ]; then
-    podman cp $2 $__RUNNING_CONTAINER:$2
+if [ -f $1 ]; then
+    podman cp $1 $__RUNNING_CONTAINER:$1
 fi
 
 cmd="$shell \"$@\""

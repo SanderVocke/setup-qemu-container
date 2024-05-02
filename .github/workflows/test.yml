@@ -44,7 +44,7 @@ jobs:
       shell: run_in_container.sh {0}
       run: |
         echo "Arch in container: $(uname -m)"
-    - name: Print arch from within container with Bash
-      shell: run_in_container.sh --shell bash {0}
+    - name: Print arch from within container with explicit shell
+      shell: run_in_container.sh --shell sh {0}
       run: |
         echo "Arch in container: $(uname -m)"

@@ -43,11 +43,6 @@ runs:
          CMD="podman run $ARGS --cidfile ${{ github.action_path }}/container_cid ${{ inputs.container }} tail -f /dev/null"
          echo "Full podman command: $CMD"
          echo "PODMAN_CMD=$CMD" >> $GITHUB_ENV
-    # - name: Run container
-    #   shell: bash
-    #   run: |
-    #     echo "Running: $PODMAN_CMD"
-    #     $PODMAN_CMD
     - name: Run container
       uses: JarvusInnovations/background-action@v1
       with:

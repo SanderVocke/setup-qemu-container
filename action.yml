@@ -19,19 +19,27 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Setup virtual container
-      uses: jirutka/setup-alpine@v1
-      with:
-        arch: ${{ inputs.arch }}
-        packages: podman findmnt
-    - name: Start container process
-      if: ${{ inputs.container }}
-      shell: alpine.sh --root {0}
+    - name: Install packages
+      uses: ConorMacBride/install-package@v1
+        with:
+          apt: podman qemu qemu-arm-static
+    - name: Run container
+      shell: bash
       run: |
-         XDG_RUNTIME_DIR="" podman info --debug
-         mount --bind / /
-         findmnt -l
-         XDG_RUNTIME_DIR="" podman run ${{ inputs.container }}
+         podman run --arch aarch64 -privileged=true -it archlinux echo "hello world"
+    # - name: Setup virtual container
+    #   uses: jirutka/setup-alpine@v1
+    #   with:
+    #     arch: ${{ inputs.arch }}
+    #     packages: podman findmnt
+    # - name: Start container process
+    #   if: ${{ inputs.container }}
+    #   shell: alpine.sh --root {0}
+    #   run: |
+    #      XDG_RUNTIME_DIR="" podman info --debug
+    #      mount --bind / /
+    #      findmnt -l
+    #      XDG_RUNTIME_DIR="" podman run ${{ inputs.container }}
     # - name: Start container process
     #   if: ${{ inputs.container }}
     #   uses: JarvusInnovations/background-action@v1

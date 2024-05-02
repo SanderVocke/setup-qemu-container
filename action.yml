@@ -41,7 +41,7 @@ runs:
            ARGS="$ARGS --arch ${{ inputs.arch }}"
          fi
          ARGS="$ARGS ${{ inputs.podman_args }}"
-         CMD="podman run $ARGS --cidfile ${{ github.action_path }}/container_cid ${{ inputs.container }} sleep 100"
+         CMD="podman run $ARGS --cidfile ${{ github.action_path }}/container_cid ${{ inputs.container }} /bin/sh -c 'sleep 100'"
          echo "Full podman command: $CMD"
          $CMD
 

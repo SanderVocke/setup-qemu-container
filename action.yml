@@ -28,7 +28,9 @@ runs:
       if: ${{ inputs.container }}
       shell: bash
       run: |
-        alpine.sh <(podman run ${{ inputs.container }})
+        export SCRIPT=$(mktemp)
+        echo "podman run ${{ inputs.container }}" > $SCRIPT
+        alpine.sh $SCRIPT
     # - name: Start container process
     #   if: ${{ inputs.container }}
     #   uses: JarvusInnovations/background-action@v1

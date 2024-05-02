@@ -1,3 +1,5 @@
+#!/bin/sh
+
 shell="/bin/sh -eo pipefail"
 case "$1" in
 	--shell) shell=$2; shift; shift;;

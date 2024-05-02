@@ -35,6 +35,9 @@ jobs:
         container: ${{ matrix.job.container }}
         arch: ${{ matrix.job.arch }}
         podman_args: ${{ matrix.args }}
+    - name: Inspect container
+      shell: bash
+      run: podman inspect $__RUNNING_CONTAINER
     - name: Print arch from within container
       shell: run_in_container.sh {0}
       run: |

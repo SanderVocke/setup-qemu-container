@@ -11,7 +11,8 @@ if [ -f $1 ]; then
     podman cp $1 $__RUNNING_CONTAINER:$1
 fi
 
-cmd="$shell \"$@\""
+cmd="$shell $@"
 
 echo "Running in container $__RUNNING_CONTAINER: $cmd"
+podman exec $__RUNNING_CONTAINER ls -la $(dirname $1)
 podman exec $__RUNNING_CONTAINER $cmd

@@ -50,5 +50,6 @@ runs:
     - name: Get CID
       shell: bash
       run: |
-        echo "__RUNNING_CONTAINER=$(cat ${{ github.action_path }}/container_cid)" >> $GITHUB_ENV
-        echo "Container CID: $__RUNNING_CONTAINER"
+        $CID=$(cat ${{ github.action_path }}/container_cid)
+        echo "__RUNNING_CONTAINER=$CID" >> $GITHUB_ENV
+        echo "Container CID: $CID"

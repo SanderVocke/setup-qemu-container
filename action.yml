@@ -46,7 +46,8 @@ runs:
     - name: Run container
       shell: bash
       run: |
-        ${{ github.env.PODMAN_CMD }}
+        echo "Running: $PODMAN_CMD"
+        $PODMAN_CMD
     # - name: Run container
     #   uses: JarvusInnovations/background-action@v1
     #   with:

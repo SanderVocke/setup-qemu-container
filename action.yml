@@ -26,7 +26,7 @@ runs:
     - name: Run container
       shell: bash
       run: |
-         podman run --arch aarch64 --privileged=true alpine echo "hello world"
+         podman run --arch amd64 --privileged=true alpine echo "hello world"
     # - name: Setup virtual container
     #   uses: jirutka/setup-alpine@v1
     #   with:

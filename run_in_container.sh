@@ -7,7 +7,7 @@ esac
 
 if [ -f $1 ]; then
     echo "Copying $1 to container"
-	pocman exec $__RUNNING_CONTAINER mkdir -p $(dirname $1)
+	podman exec $__RUNNING_CONTAINER mkdir -p $(dirname $1)
     podman cp $1 $__RUNNING_CONTAINER:$1
 fi
 

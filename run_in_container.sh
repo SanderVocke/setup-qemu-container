@@ -6,6 +6,7 @@ case "$1" in
 esac
 
 if [ -f $1 ]; then
+    echo "Copying $1 to container"
     podman cp $1 $__RUNNING_CONTAINER:$1
 fi
 

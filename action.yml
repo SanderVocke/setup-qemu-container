@@ -21,8 +21,8 @@ runs:
   steps:
     - name: Install packages
       uses: ConorMacBride/install-package@v1
-        with:
-          apt: podman qemu qemu-arm-static
+      with:
+        apt: podman qemu qemu-arm-static
     - name: Run container
       shell: bash
       run: |

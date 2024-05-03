@@ -38,7 +38,7 @@ jobs:
     steps:
     - name: Start container
       if: ${{ matrix.job.container }}
-      uses: ./
+      uses: sandervocke/setup-qemu-container@v1
       with:
         container: ${{ matrix.job.container }}
         arch: ${{ matrix.job.arch }}

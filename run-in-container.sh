@@ -16,7 +16,7 @@ fi
 # Delete past temporary files for GITHUB_OUTPUT and GITHUB_ENV
 OUT_FILE=/tmp/_gha_output
 ENV_FILE=/tmp/_gha_env
-podman exec $__RUNNING_CONTAINER "rm -f $OUT_FILE $ENV_FILE && touch $OUT_FILE && touch $ENV_FILE"
+podman exec $__RUNNING_CONTAINER /bin/sh -c "rm -f $OUT_FILE $ENV_FILE && touch $OUT_FILE && touch $ENV_FILE"
 
 # Run the command/script
 cmd="$shell $@"

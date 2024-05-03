@@ -1,4 +1,4 @@
-name: Setup Virtual Container
+name: Setup QEMU Container
 description: Set up a podman-powered, QEMU-enabled container for use in workflow steps.
 author: Sander Vocke
 branding:

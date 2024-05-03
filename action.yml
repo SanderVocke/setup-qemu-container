@@ -1,6 +1,9 @@
 name: Setup Virtual Container
 description: Set up a podman-powered, QEMU-enabled container for use in workflow steps.
 author: Sander Vocke
+branding:
+   color: yellow
+   icon: box
 
 inputs:
   container:

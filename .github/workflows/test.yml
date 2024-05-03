@@ -71,11 +71,11 @@ jobs:
         LOCAL_OUTSIDE_ENV: "LOCAL_OUTSIDE"
       run: |
         RVAL=0
-        [[ "${OUTSIDE_VAR}" != "ENV_OUTSIDE" ]] && echo "Error: OUTSIDE_VAR check failed: $OUTSIDE_VAR" && RVAL=1
-        [[ "${INSIDE_VAR}" != "ENV_INSIDE" ]] && echo "Error: INSIDE_VAR check failed: $INSIDE_VAR" && RVAL=1
-        [[ "${LOCAL_OUTSIDE_ENV}" != "LOCAL_OUTSIDE" ]] && echo "Error: LOCAL_OUTSIDE_ENV check failed: $LOCAL_OUTSIDE_ENV" && RVAL=1
-        [[ "${{ steps.set_outside.outputs.value }}" != "I_AM_OUTSIDE" ]] && echo "Error: outside output check failed: ${{ steps.set_outside.outputs.value }}" && RVAL=1
-        [[ "${{ steps.set_inside.outputs.value }}" != "I_AM_INSIDE" ]] && echo "Error: inside output check failed: ${{ steps.set_inside.outputs.value }}" && RVAL=1
+        echo "OUTSIDE_VAR: $OUTSIDE_VAR"; [[ "${OUTSIDE_VAR}" != "ENV_OUTSIDE" ]] && echo "Error: OUTSIDE_VAR check failed: $OUTSIDE_VAR" && RVAL=1
+        echo "INSIDE_VAR: $INSIDE_VAR"; [[ "${INSIDE_VAR}" != "ENV_INSIDE" ]] && echo "Error: INSIDE_VAR check failed: $INSIDE_VAR" && RVAL=1
+        echo "LOCAL_OUTSIDE_ENV: $LOCAL_OUTSIDE_ENV"; [[ "${LOCAL_OUTSIDE_ENV}" != "LOCAL_OUTSIDE" ]] && echo "Error: LOCAL_OUTSIDE_ENV check failed: $LOCAL_OUTSIDE_ENV" && RVAL=1
+        echo "outside output: ${{ steps.set_outside.outputs.value }}"; [[ "${{ steps.set_outside.outputs.value }}" != "I_AM_OUTSIDE" ]] && echo "Error: outside output check failed: ${{ steps.set_outside.outputs.value }}" && RVAL=1
+        echo "inside output: ${{ steps.set_inside.outputs.value }}"; [[ "${{ steps.set_inside.outputs.value }}" != "I_AM_INSIDE" ]] && echo "Error: inside output check failed: ${{ steps.set_inside.outputs.value }}" && RVAL=1
         exit $RVAL
     - name: Check output and env from inside container
       if: success() || failure()
@@ -84,9 +84,9 @@ jobs:
         LOCAL_INSIDE_ENV: "LOCAL_INSIDE"
       run: |
         RVAL=0
-        [[ "${OUTSIDE_VAR}" != "ENV_OUTSIDE" ]] && echo "Error: OUTSIDE_VAR check failed: $OUTSIDE_VAR" && RVAL=1
-        [[ "${INSIDE_VAR}" != "ENV_INSIDE" ]] && echo "Error: INSIDE_VAR check failed: $INSIDE_VAR" && RVAL=1
-        [[ "${LOCAL_INSIDE_ENV}" != "LOCAL_INSIDE" ]] && echo "Error: LOCAL_INSIDE_ENV check failed: $LOCAL_INSIDE_ENV" && RVAL=1
-        [[ "${{ steps.set_outside.outputs.value }}" != "I_AM_OUTSIDE" ]] && echo "Error: outside output check failed: ${{ steps.set_outside.outputs.value }}" && RVAL=1
-        [[ "${{ steps.set_inside.outputs.value }}" != "I_AM_INSIDE" ]] && echo "Error: inside output check failed: ${{ steps.set_inside.outputs.value }}" && RVAL=1
+        echo "OUTSIDE_VAR: $OUTSIDE_VAR"; [[ "${OUTSIDE_VAR}" != "ENV_OUTSIDE" ]] && echo "Error: OUTSIDE_VAR check failed: $OUTSIDE_VAR" && RVAL=1
+        echo "INSIDE_VAR: $INSIDE_VAR"; [[ "${INSIDE_VAR}" != "ENV_INSIDE" ]] && echo "Error: INSIDE_VAR check failed: $INSIDE_VAR" && RVAL=1
+        echo "LOCAL_INSIDE_ENV: $LOCAL_INSIDE_ENV"; [[ "${LOCAL_INSIDE_ENV}" != "LOCAL_INSIDE" ]] && echo "Error: LOCAL_INSIDE_ENV check failed: $LOCAL_INSIDE_ENV" && RVAL=1
+        echo "outside output: ${{ steps.set_outside.outputs.value }}"; [[ "${{ steps.set_outside.outputs.value }}" != "I_AM_OUTSIDE" ]] && echo "Error: outside output check failed: ${{ steps.set_outside.outputs.value }}" && RVAL=1
+        echo "inside output: ${{ steps.set_inside.outputs.value }}"; [[ "${{ steps.set_inside.outputs.value }}" != "I_AM_INSIDE" ]] && echo "Error: inside output check failed: ${{ steps.set_inside.outputs.value }}" && RVAL=1
         exit $RVAL

@@ -1,8 +1,5 @@
 name: Setup Virtual Container
-description: >
-  Set up a Linux container to use in workflow steps. Because the container is run inside a virtualized
-  Alpine Linux distribution provided by jirutka/setup-alpine, the container can run on a different
-  CPU architecture.
+description: Set up a podman-powered, QEMU-enabled container for use in workflow steps.
 author: Sander Vocke
 
 inputs:

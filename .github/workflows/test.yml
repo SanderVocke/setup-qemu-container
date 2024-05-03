@@ -42,12 +42,12 @@ jobs:
       shell: bash
       run: podman inspect $__RUNNING_CONTAINER
     - name: Print arch from within container
-      shell: run_in_container.sh {0}
+      shell: run-in-container.sh {0}
       run: |
         echo "Arch in container: $(uname -m)"
     - name: Print arch from within container with explicit shell
       if: success() || failure()
-      shell: run_in_container.sh --shell sh {0}
+      shell: run-in-container.sh --shell sh {0}
       run: |
         echo "Arch in container: $(uname -m)"
     - name: Set output and env from outside container
@@ -59,7 +59,7 @@ jobs:
         echo "OUTSIDE_VAR=ENV_OUTSIDE" >> $GITHUB_ENV
     - name: Set output and env from inside container
       if: success() || failure()
-      shell: run_in_container.sh {0}
+      shell: run-in-container.sh {0}
       id: set_inside
       run: |
         echo "value=I_AM_INSIDE" >> $GITHUB_OUTPUT

@@ -21,7 +21,7 @@ podman exec $__RUNNING_CONTAINER /bin/sh -c "rm -f $OUT_FILE $ENV_FILE && touch 
 # Run the command/script
 cmd="$shell $@"
 echo "Running in container $__RUNNING_CONTAINER: $cmd"
-podman exec -e GITHUB_OUTPUT=$OUT_FILE -e GITHUB_ENV=$ENV_FILE $__RUNNING_CONTAINER $cmd
+podman exec -e GITHUB_OUTPUT=$OUT_FILE -e GITHUB_ENV=$ENV_FILE -w $GITHUB_WORKSPACE $__RUNNING_CONTAINER $cmd
 
 # Propagate GITHUB_OUTPUT and GITHUB_ENV back out
 LOCAL_OUT=$(mktemp)

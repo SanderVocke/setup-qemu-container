@@ -79,7 +79,7 @@ jobs:
         exit $RVAL
     - name: Check output and env from inside container
       if: success() || failure()
-      shell: bash
+      shell: run-in-container.sh {0}
       env:
         LOCAL_INSIDE_ENV: "LOCAL_INSIDE"
       run: |
@@ -90,3 +90,27 @@ jobs:
         echo "outside output: ${{ steps.set_outside.outputs.value }}"; [[ "${{ steps.set_outside.outputs.value }}" != "I_AM_OUTSIDE" ]] && echo "Error: outside output check failed: ${{ steps.set_outside.outputs.value }}" && RVAL=1
         echo "inside output: ${{ steps.set_inside.outputs.value }}"; [[ "${{ steps.set_inside.outputs.value }}" != "I_AM_INSIDE" ]] && echo "Error: inside output check failed: ${{ steps.set_inside.outputs.value }}" && RVAL=1
         exit $RVAL
+    - name: Create a file from outside container
+      if: success() || failure()
+      shell: bash
+      run: echo "HELLO OUTSIDE" > file_created_outside
+    - name: Create a file from inside container
+      if: success() || failure()
+      shell: run-in-container.sh {0}
+      run: echo "HELLO INSIDE" > file_created_inside
+    - name: Check files outside container
+      if: success() || failure()
+      shell: bash
+      run: |
+        RVAL=0
+        echo "file outside contents: $(cat file_created_outside)"; [[ "$(cat file_created_outside)" != "HELLO OUTSIDE" ]] && echo "Error: outside file check failed: $(cat file_created_outside)" && RVAL=1
+        echo "file inside contents: $(cat file_created_inside)"; [[ "$(cat file_created_inside)" != "HELLO INSIDE" ]] && echo "Error: inside file check failed: $(cat file_created_inside)" && RVAL=1
+        exit RVAL
+    - name: Check files inside container
+      if: success() || failure()
+      shell: run-in-container.sh {0}
+      run: |
+        RVAL=0
+        echo "file outside contents: $(cat file_created_outside)"; [[ "$(cat file_created_outside)" != "HELLO OUTSIDE" ]] && echo "Error: outside file check failed: $(cat file_created_outside)" && RVAL=1
+        echo "file inside contents: $(cat file_created_inside)"; [[ "$(cat file_created_inside)" != "HELLO INSIDE" ]] && echo "Error: inside file check failed: $(cat file_created_inside)" && RVAL=1
+        exit RVAL

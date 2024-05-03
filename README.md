@@ -20,4 +20,47 @@ steps:
       run: echo "Arch in container: $(uname -m)"
 ```
 
+## Matrix jobs
+
+Combining this Action with https://github.com/SanderVocke/setup-shell-wrapper makes it possible to run matrix jobs where some jobs run within containers and some don't.
+
+```yaml
+jobs:
+  test:
+    strategy:
+      matrix:
+        job:
+           - container: false
+             arch: false
+           - container: alpine
+             arch: arm
+    runs-on: ubuntu-latest
+    steps:
+    - name: Start container
+      if: ${{ matrix.job.container }}
+      uses: ./
+      with:
+        container: ${{ matrix.job.container }}
+        arch: ${{ matrix.job.arch }}
+
+    - name: Setup Shell Wrapper
+      uses: sandervocke/setup-shell-wrapper@v1
+
+    - name: Use regular shell   # Only triggered for non-container jobs
+      if: ${{ ! matrix.job.container }}
+      shell: bash
+      run: echo "WRAP_SHELL=bash" >> $GITHUB_ENV
+
+    - name: Use container shell   # Only triggered for container jobs
+      if: ${{ matrix.job.container }}
+      shell: bash
+      run: echo "WRAP_SHELL=run-in-container.sh" >> $GITHUB_ENV
+
+    - name: Print architecture and OS
+      shell: wrap-shell.sh {0}
+      run: |
+        echo "Architecture: $(uname -m)"
+        cat /etc/os-release
+```
+
 For more examples, see .github/workflows/test.yml for examples on how to use this step.

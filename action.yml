@@ -28,8 +28,6 @@ runs:
     - name: Setup
       shell: bash
       run: |
-        pwd
-        ls -la
         sudo -E ./setup.sh
       working-directory: ${{ github.action_path }}
     - name: Set up command
@@ -40,7 +38,7 @@ runs:
            ARGS="$ARGS --arch ${{ inputs.arch }}"
          fi
          ARGS="$ARGS ${{ inputs.podman_args }}"
-         CMD="podman run $ARGS --cidfile ${{ github.action_path }}/container_cid ${{ inputs.container }} tail -f /dev/null"
+         CMD="podman run $ARGS -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE --cidfile ${{ github.action_path }}/container_cid ${{ inputs.container }} tail -f /dev/null"
          echo "Full podman command: $CMD"
          echo "PODMAN_CMD=$CMD" >> $GITHUB_ENV
     - name: Run container

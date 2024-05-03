@@ -38,6 +38,7 @@ jobs:
         arch: ${{ matrix.job.arch }}
         podman_args: ${{ matrix.args }}
     - name: Inspect container
+      if: success() || failure()
       shell: bash
       run: podman inspect $__RUNNING_CONTAINER
     - name: Print arch from within container
@@ -45,28 +46,29 @@ jobs:
       run: |
         echo "Arch in container: $(uname -m)"
     - name: Print arch from within container with explicit shell
+      if: success() || failure()
       shell: run_in_container.sh --shell sh {0}
       run: |
         echo "Arch in container: $(uname -m)"
     - name: Set output and env from outside container
+      if: success() || failure()
       shell: bash
       id: set_outside
-      continue-on-error: true
       run: |
         echo "value=I_AM_OUTSIDE" >> $GITHUB_OUTPUT
         echo "OUTSIDE_VAR=ENV_OUTSIDE" >> $GITHUB_ENV
     - name: Set output and env from inside container
+      if: success() || failure()
       shell: run_in_container.sh {0}
       id: set_inside
-      continue-on-error: true
       run: |
         echo "value=I_AM_INSIDE" >> $GITHUB_OUTPUT
         echo "INSIDE_VAR=ENV_INSIDE" >> $GITHUB_ENV
     - name: Check output and env from outside container
+      if: success() || failure()
       shell: bash
       env:
         LOCAL_OUTSIDE_ENV: "LOCAL_OUTSIDE"
-      continue-on-error: true
       run: |
         RVAL=0
         [[ "${OUTSIDE_VAR}" != "ENV_OUTSIDE" ]] && echo "Error: OUTSIDE_VAR check failed: $OUTSIDE_VAR" && RVAL=1
@@ -76,10 +78,10 @@ jobs:
         [[ "${{ steps.set_inside.outputs.value }}" != "I_AM_INSIDE" ]] && echo "Error: inside output check failed: ${{ steps.set_inside.outputs.value }}" && RVAL=1
         exit $RVAL
     - name: Check output and env from inside container
+      if: success() || failure()
       shell: bash
       env:
         LOCAL_INSIDE_ENV: "LOCAL_INSIDE"
-      continue-on-error: true
       run: |
         RVAL=0
         [[ "${OUTSIDE_VAR}" != "ENV_OUTSIDE" ]] && echo "Error: OUTSIDE_VAR check failed: $OUTSIDE_VAR" && RVAL=1

@@ -105,7 +105,7 @@ jobs:
         RVAL=0
         echo "file outside contents: $(cat file_created_outside)"; [[ "$(cat file_created_outside)" != "HELLO OUTSIDE" ]] && echo "Error: outside file check failed: $(cat file_created_outside)" && RVAL=1
         echo "file inside contents: $(cat file_created_inside)"; [[ "$(cat file_created_inside)" != "HELLO INSIDE" ]] && echo "Error: inside file check failed: $(cat file_created_inside)" && RVAL=1
-        exit RVAL
+        exit $RVAL
     - name: Check files inside container
       if: success() || failure()
       shell: run-in-container.sh {0}
@@ -113,4 +113,4 @@ jobs:
         RVAL=0
         echo "file outside contents: $(cat file_created_outside)"; [[ "$(cat file_created_outside)" != "HELLO OUTSIDE" ]] && echo "Error: outside file check failed: $(cat file_created_outside)" && RVAL=1
         echo "file inside contents: $(cat file_created_inside)"; [[ "$(cat file_created_inside)" != "HELLO INSIDE" ]] && echo "Error: inside file check failed: $(cat file_created_inside)" && RVAL=1
-        exit RVAL
+        exit $RVAL

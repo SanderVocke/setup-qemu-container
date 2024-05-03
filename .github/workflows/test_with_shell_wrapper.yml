@@ -36,7 +36,7 @@ jobs:
         container: ${{ matrix.job.container }}
         arch: ${{ matrix.job.arch }}
     - name: Setup Shell Wrapper
-      uses: sandervocke/setup-shell-wrapper@v1
+      uses: sandervocke/setup-shell-wrapper@v1.0.0
     - name: Use regular shell
       if: ${{ ! matrix.job.container }}
       shell: bash

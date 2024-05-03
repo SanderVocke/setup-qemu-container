@@ -36,7 +36,7 @@ jobs:
         container: ${{ matrix.job.container }}
         arch: ${{ matrix.job.arch }}
     - name: Setup Shell Wrapper
-      uses: sandervocke/setup-shell-wrapper@v1.0.0
+      uses: sandervocke/setup-shell-wrapper@v1
     - name: Use regular shell
       if: ${{ ! matrix.job.container }}
       shell: bash
@@ -49,4 +49,4 @@ jobs:
       shell: wrap-shell.sh {0}
       run: |
         echo "Architecture: $(uname -m)"
-        cat /etc/os_release
+        cat /etc/os-release

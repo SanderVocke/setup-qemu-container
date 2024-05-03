@@ -1,0 +1,52 @@
+name: Test With Shell Wrapper
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+           - container: false
+             arch: false
+           - container: alpine
+             arch: arm
+          
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: Start container
+      if: ${{ matrix.job.container }}
+      uses: ./
+      with:
+        container: ${{ matrix.job.container }}
+        arch: ${{ matrix.job.arch }}
+    - name: Setup Shell Wrapper
+      uses: sandervocke/setup-shell-wrapper@v1
+    - name: Use regular shell
+      if: ${{ ! matrix.job.container }}
+      shell: bash
+      run: echo "WRAP_SHELL=bash" >> $GITHUB_ENV
+    - name: Use container shell
+      if: ${{ matrix.job.container }}
+      shell: bash
+      run: echo "WRAP_SHELL=run-in-container.sh" >> $GITHUB_ENV
+    - name: Print architecture and OS
+      shell: wrap-shell.sh {0}
+      run: |
+        echo "Architecture: $(uname -m)"
+        cat /etc/os_release

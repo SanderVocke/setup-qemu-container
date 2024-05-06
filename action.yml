@@ -17,6 +17,10 @@ inputs:
   podman_args:
     description: >
       Additional arguments to podman.
+  user:
+    description: >
+      User passed to podman commands as --user.
+    default: root
 
 runs:
   using: composite
@@ -38,7 +42,7 @@ runs:
            ARGS="$ARGS --arch ${{ inputs.arch }}"
          fi
          ARGS="$ARGS ${{ inputs.podman_args }}"
-         CMD="podman run $ARGS -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE --cidfile ${{ github.action_path }}/container_cid ${{ inputs.container }} tail -f /dev/null"
+         CMD="podman run --user ${{ inputs.user }} $ARGS -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE --cidfile ${{ github.action_path }}/container_cid ${{ inputs.container }} tail -f /dev/null"
          echo "Full podman command: $CMD"
          echo "PODMAN_CMD=$CMD" >> $GITHUB_ENV
     - name: Run container
@@ -53,4 +57,6 @@ runs:
       run: |
         CID=$(cat ${{ github.action_path }}/container_cid)
         echo "__RUNNING_CONTAINER=$CID" >> $GITHUB_ENV
+        echo "__PODMAN_CMD=podman" >> $GITHUB_ENV
+        echo "__PODMAN_ARGS=--user ${{ inputs.user }}" >> $GITHUB_ENV
         echo "Container CID: $CID"

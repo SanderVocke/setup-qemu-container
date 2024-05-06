@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Allow overriding with a custom shell inside the container
-shell="/bin/sh -eo pipefail"
+shell="/bin/sh"
 case "$1" in
 	--shell) shell=$2; shift; shift;;
 esac

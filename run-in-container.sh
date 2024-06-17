@@ -17,8 +17,9 @@ fi
 OUT_FILE=/tmp/_gha_output
 ENV_FILE=/tmp/_gha_env
 podman exec $__RUNNING_CONTAINER /bin/sh -c "rm -f $OUT_FILE $ENV_FILE && touch $OUT_FILE && touch $ENV_FILE"
-if [ $? -ne 0 ]; then
-   echo "Unable to clean container's previous outputs"
+STATUS=$?
+if [ $STATUS -ne 0 ]; then
+   echo "Unable to clean container's previous outputs (error code $STATUS)"
    exit 1
 fi
 
@@ -26,8 +27,9 @@ fi
 cmd="$shell $@"
 echo "Running in container $__RUNNING_CONTAINER: $cmd"
 podman exec -e GITHUB_OUTPUT=$OUT_FILE -e GITHUB_ENV=$ENV_FILE -w $GITHUB_WORKSPACE $__RUNNING_CONTAINER $cmd
-if [ $? -ne 0 ]; then
-   echo "Container command failed"
+STATUS=$?
+if [ $STATUS -ne 0 ]; then
+   echo "Container command failed with code $STATUS"
    exit 1
 fi
 

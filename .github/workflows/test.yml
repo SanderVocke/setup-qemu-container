@@ -114,3 +114,17 @@ jobs:
         echo "file outside contents: $(cat file_created_outside)"; [[ "$(cat file_created_outside)" != "HELLO OUTSIDE" ]] && echo "Error: outside file check failed: $(cat file_created_outside)" && RVAL=1
         echo "file inside contents: $(cat file_created_inside)"; [[ "$(cat file_created_inside)" != "HELLO INSIDE" ]] && echo "Error: inside file check failed: $(cat file_created_inside)" && RVAL=1
         exit $RVAL
+    - name: Check failure propagation from container
+      if: success() || failure()
+      shell: run-in-container.sh {0}
+      run: exit 1
+      continue-on-error: true # will pass the job regardless of result
+      id: check_propagate_failure
+    - name: Check failure propagation from container, part 2 (if not OK)
+      shell: bash
+      if: ${{ steps.check_propagate_failure.outcome != 'failure' }}
+      run: |
+        echo "Container step should have failed, but status is not failure"
+        exit 1
+
+      

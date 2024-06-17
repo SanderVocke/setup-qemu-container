@@ -46,7 +46,7 @@ jobs:
       shell: bash
       run: echo "WRAP_SHELL=run-in-container.sh" >> $GITHUB_ENV
     - name: Print architecture and OS
-      shell: wrap-shell.sh {0}
+      shell: wrap-shell {0}
       run: |
         echo "Architecture: $(uname -m)"
         cat /etc/os-release

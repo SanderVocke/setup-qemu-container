@@ -16,13 +16,16 @@ fi
 # Delete past temporary files for GITHUB_OUTPUT and GITHUB_ENV
 OUT_FILE=/tmp/_gha_output
 ENV_FILE=/tmp/_gha_env
-podman exec $__RUNNING_CONTAINER /bin/sh -c "rm -f $OUT_FILE $ENV_FILE && touch $OUT_FILE && touch $ENV_FILE"
+if ! podman exec $__RUNNING_CONTAINER /bin/sh -c "rm -f $OUT_FILE $ENV_FILE && touch $OUT_FILE && touch $ENV_FILE"; then
+    FAILURE=1
+fi
 
 # Run the command/script
 cmd="$shell $@"
 echo "Running in container $__RUNNING_CONTAINER: $cmd"
-podman exec -e GITHUB_OUTPUT=$OUT_FILE -e GITHUB_ENV=$ENV_FILE -w $GITHUB_WORKSPACE $__RUNNING_CONTAINER $cmd
-RESULT=$?
+if ! podman exec -e GITHUB_OUTPUT=$OUT_FILE -e GITHUB_ENV=$ENV_FILE -w $GITHUB_WORKSPACE $__RUNNING_CONTAINER $cmd; then
+    FAILURE=1
+fi
 
 # Propagate GITHUB_OUTPUT and GITHUB_ENV back out
 LOCAL_OUT=$(mktemp)
@@ -36,4 +39,7 @@ for line in $(cat $LOCAL_ENV); do
   echo "$line" >> $GITHUB_ENV
 done
 
-exit $RESULT
+if [ -n "$variable_name" ]; then
+    echo "Container command failed."
+    exit 1
+fi

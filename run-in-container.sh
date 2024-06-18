@@ -9,6 +9,9 @@ esac
 # Grant access to container user to workspace
 sudo chmod -R o+rx "$GITHUB_WORKSPACE"
 
+OUT_FILE=/tmp/_gha_output
+ENV_FILE=/tmp/_gha_env
+
 read -r -d '' unshare_script <<EOF
   set -o xtrace
   mnt=\$(podman mount $__RUNNING_CONTAINER)
@@ -21,8 +24,8 @@ read -r -d '' unshare_script <<EOF
   fi
   # Delete past temporary files for GITHUB_OUTPUT and GITHUB_ENV
   if [ ! -z "\$mnt" ]; then
-    rm -f \$mnt/tmp/_gha_output && touch \$mnt/tmp/_gha_output
-    rm -f \$mnt/tmp/_gha_env && touch \$mnt/tmp/_gha_env
+    rm -f \$mnt/$OUT_FILE && touch \$mnt/$OUT_FILE
+    rm -f \$mnt/$ENV_FILE && touch \$mnt/$ENV_FILE
   fi
   podman unmount $__RUNNING_CONTAINER
 EOF

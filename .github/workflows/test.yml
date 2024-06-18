@@ -126,6 +126,7 @@ jobs:
         echo "Container step should have failed, but status is not failure"
         exit 1
     - name: Setup tmate session
+      if: success() || failure()
       uses: SanderVocke/action-tmate@master
 
       

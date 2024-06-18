@@ -6,23 +6,26 @@ case "$1" in
 	--shell) shell=$2; shift; shift;;
 esac
 
-# Mount the container rootfs
-
-
-# Copy the shell script, if any, into the container at same path
-if [ -f $1 ]; then
+# Prepare the container
+podman unshare sh <<EOF
+  mnt=\$(podman mount $__RUNNING_CONTAINER)
+  if [ -f $1 ]; then
+    # Copy the shell script, if any, into the container at same path
     echo "Copying $1 to container"
-	podman exec $__RUNNING_CONTAINER mkdir -p $(dirname $1)
-    podman cp $1 $__RUNNING_CONTAINER:$1
-fi
-
-# Delete past temporary files for GITHUB_OUTPUT and GITHUB_ENV
-OUT_FILE=/tmp/_gha_output
-ENV_FILE=/tmp/_gha_env
-podman exec $__RUNNING_CONTAINER /bin/sh -c "rm -f $OUT_FILE $ENV_FILE && touch $OUT_FILE && touch $ENV_FILE"
+    mkdir -p \$mnt/$(dirname $1)
+    cp $1 \$mnt/$1
+    chmod a+x \$mnt/$1
+  fi
+  # Delete past temporary files for GITHUB_OUTPUT and GITHUB_ENV
+  if [ ! -z "$mnt" ]; then
+    rm -f $mnt/tmp/_gha_output && touch $mnt/tmp/_gha_output
+    rm -f $mnt/tmp/_gha_env && touch $mnt/tmp/_gha_env
+  fi
+  podman unmount
+EOF
 STATUS=$?
 if [ $STATUS -ne 0 ]; then
-   echo "Unable to clean container's previous outputs (error code $STATUS)"
+   echo "Unable to prepare the container filesystem (error code $STATUS)"
    exit 1
 fi
 

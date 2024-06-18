@@ -20,7 +20,7 @@ read -r -d '' unshare_script <<EOF
     rm -f $mnt/tmp/_gha_output && touch $mnt/tmp/_gha_output
     rm -f $mnt/tmp/_gha_env && touch $mnt/tmp/_gha_env
   fi
-  podman unmount
+  podman unmount $__RUNNING_CONTAINER
 EOF
 echo "$unshare_script"
 podman unshare bash -x -c "$unshare_script"

@@ -25,7 +25,7 @@ jobs:
           - arch: null
             container: debian
           - arch: arm64
-            container: sandervocke/shoopdaloop_run_base_ubuntu_latest_arm64:latest
+            container: docker.io/sandervocke/shoopdaloop_run_base_ubuntu_latest_arm64:latest
         args:
           [ null, '--privileged' ]
           

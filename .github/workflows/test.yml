@@ -31,7 +31,10 @@ jobs:
     - name: Test container shell
       shell: wrap-shell {0}
       run: echo "Hello world!"
+    - name: Setup tmate session
+      uses: SanderVocke/action-tmate@master
 
+      
   # test:
   #   strategy:
   #     fail-fast: false

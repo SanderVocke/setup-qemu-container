@@ -22,6 +22,10 @@ jobs:
             container: quay.io/pypa/manylinux_2_28_aarch64
           - arch: arm
             container: alpine
+          - arch: null
+            container: debian
+          - arch: arm64
+            container: sandervocke/shoopdaloop_run_base_ubuntu_latest_arm64:latest
         args:
           [ null, '--privileged' ]
           
@@ -62,6 +66,7 @@ jobs:
       shell: run-in-container.sh {0}
       id: set_inside
       run: |
+        echo "GITHUB_OUTPUT: $GITHUB_OUTPUT. GITHUB_ENV: $GITHUB_ENV"
         echo "value=I_AM_INSIDE" >> $GITHUB_OUTPUT
         echo "INSIDE_VAR=ENV_INSIDE" >> $GITHUB_ENV
     - name: Check output and env from outside container
@@ -92,7 +97,12 @@ jobs:
     - name: Create a file from inside container
       if: success() || failure()
       shell: run-in-container.sh {0}
-      run: echo "HELLO INSIDE" > file_created_inside
+      run: |
+         set -o xtrace
+         echo "Current directory: $(pwd)"
+         ls -d -a -l $(pwd)
+         ls -l -a /tmp/_gha*
+         echo "HELLO INSIDE" > file_created_inside
     - name: Check files outside container
       if: success() || failure()
       shell: bash

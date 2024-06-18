@@ -12,8 +12,8 @@ inputs:
     required: true
   arch:
     description: >
-      CPU architecture to use.
-    default: x86_64
+      CPU architecture to use. Null means native (don't pass an architecture explicitly)
+    default: null
   podman_args:
     description: >
       Additional arguments to podman.

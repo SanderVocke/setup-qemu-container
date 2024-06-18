@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Allow overriding with a custom shell inside the container
 shell="/bin/sh"
@@ -6,20 +6,34 @@ case "$1" in
 	--shell) shell=$2; shift; shift;;
 esac
 
-# Copy the shell script, if any, into the container at same path
-if [ -f $1 ]; then
-    echo "Copying $1 to container"
-	podman exec $__RUNNING_CONTAINER mkdir -p $(dirname $1)
-    podman cp $1 $__RUNNING_CONTAINER:$1
-fi
+# Grant access to container user to workspace
+sudo find "$GITHUB_WORKSPACE" -type d -exec chmod -R o+rwx {} \;
 
-# Delete past temporary files for GITHUB_OUTPUT and GITHUB_ENV
 OUT_FILE=/tmp/_gha_output
 ENV_FILE=/tmp/_gha_env
-podman exec $__RUNNING_CONTAINER /bin/sh -c "rm -f $OUT_FILE $ENV_FILE && touch $OUT_FILE && touch $ENV_FILE"
+
+read -r -d '' unshare_script <<EOF
+  set -o xtrace
+  mnt=\$(podman mount $__RUNNING_CONTAINER)
+  if [ -f $1 ]; then
+    # Copy the shell script, if any, into the container at same path
+    echo "Copying $1 to container"
+    mkdir -p \$mnt/$(dirname $1)
+    chmod a+rwx \$mnt/$(dirname $1)
+    cp $1 \$mnt/$1
+    chmod a+x \$mnt/$1
+  fi
+  # Delete past temporary files for GITHUB_OUTPUT and GITHUB_ENV
+  if [ ! -z "\$mnt" ]; then
+    rm -f \$mnt/$OUT_FILE && touch \$mnt/$OUT_FILE && chmod a+rw \$mnt/$OUT_FILE
+    rm -f \$mnt/$ENV_FILE && touch \$mnt/$ENV_FILE && chmod a+rw \$mnt/$ENV_FILE
+  fi
+  podman unmount $__RUNNING_CONTAINER
+EOF
+podman unshare bash -c "$unshare_script"
 STATUS=$?
 if [ $STATUS -ne 0 ]; then
-   echo "Unable to clean container's previous outputs (error code $STATUS)"
+   echo "Unable to prepare the container filesystem (error code $STATUS)"
    exit 1
 fi
 

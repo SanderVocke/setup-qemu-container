@@ -16,9 +16,9 @@ read -r -d '' unshare_script <<EOF
     chmod a+x \$mnt/$1
   fi
   # Delete past temporary files for GITHUB_OUTPUT and GITHUB_ENV
-  if [ ! -z "$mnt" ]; then
-    rm -f $mnt/tmp/_gha_output && touch $mnt/tmp/_gha_output
-    rm -f $mnt/tmp/_gha_env && touch $mnt/tmp/_gha_env
+  if [ ! -z "\$mnt" ]; then
+    rm -f \$mnt/tmp/_gha_output && touch \$mnt/tmp/_gha_output
+    rm -f \$mnt/tmp/_gha_env && touch \$mnt/tmp/_gha_env
   fi
   podman unmount $__RUNNING_CONTAINER
 EOF

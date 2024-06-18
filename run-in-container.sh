@@ -19,13 +19,14 @@ read -r -d '' unshare_script <<EOF
     # Copy the shell script, if any, into the container at same path
     echo "Copying $1 to container"
     mkdir -p \$mnt/$(dirname $1)
+    chmod a+rwx \$mnt/$(dirname $1)
     cp $1 \$mnt/$1
     chmod a+x \$mnt/$1
   fi
   # Delete past temporary files for GITHUB_OUTPUT and GITHUB_ENV
   if [ ! -z "\$mnt" ]; then
     rm -f \$mnt/$OUT_FILE && touch \$mnt/$OUT_FILE && chmod a+rw \$mnt/$OUT_FILE
-    rm -f \$mnt/$ENV_FILE && touch \$mnt/$ENV_FILE && chmod a+rw \$mnt/$OUT_FILE
+    rm -f \$mnt/$ENV_FILE && touch \$mnt/$ENV_FILE && chmod a+rw \$mnt/$ENV_FILE
   fi
   podman unmount $__RUNNING_CONTAINER
 EOF

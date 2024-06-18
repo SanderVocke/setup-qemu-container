@@ -100,7 +100,7 @@ jobs:
       run: |
          set -o xtrace
          echo "$(pwd)"
-         stat -c "%a" $pwd
+         stat -c "%a" $(pwd)
          echo "HELLO INSIDE" > file_created_inside
     - name: Check files outside container
       if: success() || failure()

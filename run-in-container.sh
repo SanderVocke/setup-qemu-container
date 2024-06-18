@@ -10,6 +10,7 @@ esac
 sudo chmod -R o+rx "$GITHUB_WORKSPACE"
 
 read -r -d '' unshare_script <<EOF
+  set -o xtrace
   mnt=\$(podman mount $__RUNNING_CONTAINER)
   if [ -f $1 ]; then
     # Copy the shell script, if any, into the container at same path
@@ -25,8 +26,7 @@ read -r -d '' unshare_script <<EOF
   fi
   podman unmount $__RUNNING_CONTAINER
 EOF
-echo "$unshare_script"
-podman unshare bash -x -c "$unshare_script"
+podman unshare bash -c "$unshare_script"
 STATUS=$?
 if [ $STATUS -ne 0 ]; then
    echo "Unable to prepare the container filesystem (error code $STATUS)"

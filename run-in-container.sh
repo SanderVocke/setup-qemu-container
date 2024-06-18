@@ -7,7 +7,7 @@ case "$1" in
 esac
 
 # Grant access to container user to workspace
-sudo chmod -R o+rx "$GITHUB_WORKSPACE"
+sudo find "$GITHUB_WORKSPACE" -type d -exec chmod -R o+rwx {} \;
 
 OUT_FILE=/tmp/_gha_output
 ENV_FILE=/tmp/_gha_env

@@ -7,24 +7,24 @@ case "$1" in
 esac
 
 # Prepare the container
-echo <<EOF
-  mnt=\$(podman mount $__RUNNING_CONTAINER)
-  if [ -f $1 ]; then
-    # Copy the shell script, if any, into the container at same path
-    echo "Copying $1 to container"
-    mkdir -p \$mnt/$(dirname $1)
-    cp $1 \$mnt/$1
-    chmod a+x \$mnt/$1
-  fi
-  # Delete past temporary files for GITHUB_OUTPUT and GITHUB_ENV
-  if [ ! -z "$mnt" ]; then
-    rm -f $mnt/tmp/_gha_output && touch $mnt/tmp/_gha_output
-    rm -f $mnt/tmp/_gha_env && touch $mnt/tmp/_gha_env
-  fi
-  podman unmount
-EOF
+# echo <<EOF
+#   mnt=\$(podman mount $__RUNNING_CONTAINER)
+#   if [ -f $1 ]; then
+#     # Copy the shell script, if any, into the container at same path
+#     echo "Copying $1 to container"
+#     mkdir -p \$mnt/$(dirname $1)
+#     cp $1 \$mnt/$1
+#     chmod a+x \$mnt/$1
+#   fi
+#   # Delete past temporary files for GITHUB_OUTPUT and GITHUB_ENV
+#   if [ ! -z "$mnt" ]; then
+#     rm -f $mnt/tmp/_gha_output && touch $mnt/tmp/_gha_output
+#     rm -f $mnt/tmp/_gha_env && touch $mnt/tmp/_gha_env
+#   fi
+#   podman unmount
+# EOF
 
-podman unshare sh <<EOF
+podman unshare sh -c <<EOF
   mnt=\$(podman mount $__RUNNING_CONTAINER)
   if [ -f $1 ]; then
     # Copy the shell script, if any, into the container at same path

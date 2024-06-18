@@ -6,7 +6,7 @@ case "$1" in
 	--shell) shell=$2; shift; shift;;
 esac
 
-unshare_script <<EOF
+read -r -d '' unshare_script <<EOF
   mnt=\$(podman mount $__RUNNING_CONTAINER)
   if [ -f $1 ]; then
     # Copy the shell script, if any, into the container at same path

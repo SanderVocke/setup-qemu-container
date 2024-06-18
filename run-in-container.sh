@@ -52,9 +52,9 @@ LOCAL_OUT=$(mktemp)
 LOCAL_ENV=$(mktemp)
 podman cp $__RUNNING_CONTAINER:$OUT_FILE $LOCAL_OUT
 podman cp $__RUNNING_CONTAINER:$ENV_FILE $LOCAL_ENV
-for line in $(cat $LOCAL_OUT); do
-  echo "$line" >> $GITHUB_OUTPUT
-done
-for line in $(cat $LOCAL_ENV); do
-  echo "$line" >> $GITHUB_ENV
-done
+while IFS="" read -r line; do
+  echo "$line" | tee -a $GITHUB_OUTPUT
+done < $LOCAL_OUT
+while IFS="" read -r line; do
+  echo "$line" | tee -a $GITHUB_ENV
+done < $LOCAL_ENV

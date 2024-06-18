@@ -13,113 +13,132 @@ permissions:
 
 jobs:
 
-  test:
+  test_user:
     strategy:
       fail-fast: false
-      matrix:
-        job:
-          - arch: aarch64
-            container: quay.io/pypa/manylinux_2_28_aarch64
-          - arch: arm
-            container: alpine
-        args:
-          [ null, '--privileged' ]
-          
-    runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-      with:
-        submodules: recursive
     - name: Start container
-      uses: ./
+      uses: sandervocke/setup-qemu-container@v1
       with:
-        container: ${{ matrix.job.container }}
-        arch: ${{ matrix.job.arch }}
-        podman_args: ${{ matrix.args }}
-    - name: Inspect container
-      if: success() || failure()
+        container: debian:latest
+    - name: Setup Shell Wrapper
+      uses: sandervocke/setup-shell-wrapper@v1
+    - name: Use container shell
       shell: bash
-      run: podman inspect $__RUNNING_CONTAINER
-    - name: Print arch from within container
-      shell: run-in-container.sh {0}
-      run: |
-        echo "Arch in container: $(uname -m)"
-    - name: Print arch from within container with explicit shell
-      if: success() || failure()
-      shell: run-in-container.sh --shell sh {0}
-      run: |
-        echo "Arch in container: $(uname -m)"
-    - name: Set output and env from outside container
-      if: success() || failure()
-      shell: bash
-      id: set_outside
-      run: |
-        echo "value=I_AM_OUTSIDE" >> $GITHUB_OUTPUT
-        echo "OUTSIDE_VAR=ENV_OUTSIDE" >> $GITHUB_ENV
-    - name: Set output and env from inside container
-      if: success() || failure()
-      shell: run-in-container.sh {0}
-      id: set_inside
-      run: |
-        echo "value=I_AM_INSIDE" >> $GITHUB_OUTPUT
-        echo "INSIDE_VAR=ENV_INSIDE" >> $GITHUB_ENV
-    - name: Check output and env from outside container
-      if: success() || failure()
-      shell: bash
-      env:
-        LOCAL_OUTSIDE_ENV: "LOCAL_OUTSIDE"
-      run: |
-        RVAL=0
-        echo "OUTSIDE_VAR: $OUTSIDE_VAR"; [[ "${OUTSIDE_VAR}" != "ENV_OUTSIDE" ]] && echo "Error: OUTSIDE_VAR check failed: $OUTSIDE_VAR" && RVAL=1
-        echo "INSIDE_VAR: $INSIDE_VAR"; [[ "${INSIDE_VAR}" != "ENV_INSIDE" ]] && echo "Error: INSIDE_VAR check failed: $INSIDE_VAR" && RVAL=1
-        echo "LOCAL_OUTSIDE_ENV: $LOCAL_OUTSIDE_ENV"; [[ "${LOCAL_OUTSIDE_ENV}" != "LOCAL_OUTSIDE" ]] && echo "Error: LOCAL_OUTSIDE_ENV check failed: $LOCAL_OUTSIDE_ENV" && RVAL=1
-        echo "outside output: ${{ steps.set_outside.outputs.value }}"; [[ "${{ steps.set_outside.outputs.value }}" != "I_AM_OUTSIDE" ]] && echo "Error: outside output check failed: ${{ steps.set_outside.outputs.value }}" && RVAL=1
-        echo "inside output: ${{ steps.set_inside.outputs.value }}"; [[ "${{ steps.set_inside.outputs.value }}" != "I_AM_INSIDE" ]] && echo "Error: inside output check failed: ${{ steps.set_inside.outputs.value }}" && RVAL=1
-        exit $RVAL
-    - name: Check output and env from inside container
-      if: success() || failure()
-      shell: run-in-container.sh {0}
-      run: |
-        RVAL=0
-        echo "outside output: ${{ steps.set_outside.outputs.value }}"; [[ "${{ steps.set_outside.outputs.value }}" != "I_AM_OUTSIDE" ]] && echo "Error: outside output check failed: ${{ steps.set_outside.outputs.value }}" && RVAL=1
-        echo "inside output: ${{ steps.set_inside.outputs.value }}"; [[ "${{ steps.set_inside.outputs.value }}" != "I_AM_INSIDE" ]] && echo "Error: inside output check failed: ${{ steps.set_inside.outputs.value }}" && RVAL=1
-        exit $RVAL
-    - name: Create a file from outside container
-      if: success() || failure()
-      shell: bash
-      run: echo "HELLO OUTSIDE" > file_created_outside
-    - name: Create a file from inside container
-      if: success() || failure()
-      shell: run-in-container.sh {0}
-      run: echo "HELLO INSIDE" > file_created_inside
-    - name: Check files outside container
-      if: success() || failure()
-      shell: bash
-      run: |
-        RVAL=0
-        echo "file outside contents: $(cat file_created_outside)"; [[ "$(cat file_created_outside)" != "HELLO OUTSIDE" ]] && echo "Error: outside file check failed: $(cat file_created_outside)" && RVAL=1
-        echo "file inside contents: $(cat file_created_inside)"; [[ "$(cat file_created_inside)" != "HELLO INSIDE" ]] && echo "Error: inside file check failed: $(cat file_created_inside)" && RVAL=1
-        exit $RVAL
-    - name: Check files inside container
-      if: success() || failure()
-      shell: run-in-container.sh {0}
-      run: |
-        RVAL=0
-        echo "file outside contents: $(cat file_created_outside)"; [[ "$(cat file_created_outside)" != "HELLO OUTSIDE" ]] && echo "Error: outside file check failed: $(cat file_created_outside)" && RVAL=1
-        echo "file inside contents: $(cat file_created_inside)"; [[ "$(cat file_created_inside)" != "HELLO INSIDE" ]] && echo "Error: inside file check failed: $(cat file_created_inside)" && RVAL=1
-        exit $RVAL
-    - name: Check failure propagation from container
-      if: success() || failure()
-      shell: run-in-container.sh {0}
-      run: exit 1
-      continue-on-error: true # will pass the job regardless of result
-      id: check_propagate_failure
-    - name: Check failure propagation from container, part 2 (if not OK)
-      shell: bash
-      if: ${{ steps.check_propagate_failure.outcome != 'failure' }}
-      run: |
-        echo "Container step should have failed, but status is not failure"
-        exit 1
+      run: echo "WRAP_SHELL=run-in-container.sh" >> $GITHUB_ENV
+    - name: Test container shell
+      shell: wrap-shell {0}
+      run: echo "Hello world!"
+
+  # test:
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       job:
+  #         - arch: aarch64
+  #           container: quay.io/pypa/manylinux_2_28_aarch64
+  #         - arch: arm
+  #           container: alpine
+  #       args:
+  #         [ null, '--privileged' ]
+          
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v4
+  #     with:
+  #       submodules: recursive
+  #   - name: Start container
+  #     uses: ./
+  #     with:
+  #       container: ${{ matrix.job.container }}
+  #       arch: ${{ matrix.job.arch }}
+  #       podman_args: ${{ matrix.args }}
+  #   - name: Inspect container
+  #     if: success() || failure()
+  #     shell: bash
+  #     run: podman inspect $__RUNNING_CONTAINER
+  #   - name: Print arch from within container
+  #     shell: run-in-container.sh {0}
+  #     run: |
+  #       echo "Arch in container: $(uname -m)"
+  #   - name: Print arch from within container with explicit shell
+  #     if: success() || failure()
+  #     shell: run-in-container.sh --shell sh {0}
+  #     run: |
+  #       echo "Arch in container: $(uname -m)"
+  #   - name: Set output and env from outside container
+  #     if: success() || failure()
+  #     shell: bash
+  #     id: set_outside
+  #     run: |
+  #       echo "value=I_AM_OUTSIDE" >> $GITHUB_OUTPUT
+  #       echo "OUTSIDE_VAR=ENV_OUTSIDE" >> $GITHUB_ENV
+  #   - name: Set output and env from inside container
+  #     if: success() || failure()
+  #     shell: run-in-container.sh {0}
+  #     id: set_inside
+  #     run: |
+  #       echo "value=I_AM_INSIDE" >> $GITHUB_OUTPUT
+  #       echo "INSIDE_VAR=ENV_INSIDE" >> $GITHUB_ENV
+  #   - name: Check output and env from outside container
+  #     if: success() || failure()
+  #     shell: bash
+  #     env:
+  #       LOCAL_OUTSIDE_ENV: "LOCAL_OUTSIDE"
+  #     run: |
+  #       RVAL=0
+  #       echo "OUTSIDE_VAR: $OUTSIDE_VAR"; [[ "${OUTSIDE_VAR}" != "ENV_OUTSIDE" ]] && echo "Error: OUTSIDE_VAR check failed: $OUTSIDE_VAR" && RVAL=1
+  #       echo "INSIDE_VAR: $INSIDE_VAR"; [[ "${INSIDE_VAR}" != "ENV_INSIDE" ]] && echo "Error: INSIDE_VAR check failed: $INSIDE_VAR" && RVAL=1
+  #       echo "LOCAL_OUTSIDE_ENV: $LOCAL_OUTSIDE_ENV"; [[ "${LOCAL_OUTSIDE_ENV}" != "LOCAL_OUTSIDE" ]] && echo "Error: LOCAL_OUTSIDE_ENV check failed: $LOCAL_OUTSIDE_ENV" && RVAL=1
+  #       echo "outside output: ${{ steps.set_outside.outputs.value }}"; [[ "${{ steps.set_outside.outputs.value }}" != "I_AM_OUTSIDE" ]] && echo "Error: outside output check failed: ${{ steps.set_outside.outputs.value }}" && RVAL=1
+  #       echo "inside output: ${{ steps.set_inside.outputs.value }}"; [[ "${{ steps.set_inside.outputs.value }}" != "I_AM_INSIDE" ]] && echo "Error: inside output check failed: ${{ steps.set_inside.outputs.value }}" && RVAL=1
+  #       exit $RVAL
+  #   - name: Check output and env from inside container
+  #     if: success() || failure()
+  #     shell: run-in-container.sh {0}
+  #     run: |
+  #       RVAL=0
+  #       echo "outside output: ${{ steps.set_outside.outputs.value }}"; [[ "${{ steps.set_outside.outputs.value }}" != "I_AM_OUTSIDE" ]] && echo "Error: outside output check failed: ${{ steps.set_outside.outputs.value }}" && RVAL=1
+  #       echo "inside output: ${{ steps.set_inside.outputs.value }}"; [[ "${{ steps.set_inside.outputs.value }}" != "I_AM_INSIDE" ]] && echo "Error: inside output check failed: ${{ steps.set_inside.outputs.value }}" && RVAL=1
+  #       exit $RVAL
+  #   - name: Create a file from outside container
+  #     if: success() || failure()
+  #     shell: bash
+  #     run: echo "HELLO OUTSIDE" > file_created_outside
+  #   - name: Create a file from inside container
+  #     if: success() || failure()
+  #     shell: run-in-container.sh {0}
+  #     run: echo "HELLO INSIDE" > file_created_inside
+  #   - name: Check files outside container
+  #     if: success() || failure()
+  #     shell: bash
+  #     run: |
+  #       RVAL=0
+  #       echo "file outside contents: $(cat file_created_outside)"; [[ "$(cat file_created_outside)" != "HELLO OUTSIDE" ]] && echo "Error: outside file check failed: $(cat file_created_outside)" && RVAL=1
+  #       echo "file inside contents: $(cat file_created_inside)"; [[ "$(cat file_created_inside)" != "HELLO INSIDE" ]] && echo "Error: inside file check failed: $(cat file_created_inside)" && RVAL=1
+  #       exit $RVAL
+  #   - name: Check files inside container
+  #     if: success() || failure()
+  #     shell: run-in-container.sh {0}
+  #     run: |
+  #       RVAL=0
+  #       echo "file outside contents: $(cat file_created_outside)"; [[ "$(cat file_created_outside)" != "HELLO OUTSIDE" ]] && echo "Error: outside file check failed: $(cat file_created_outside)" && RVAL=1
+  #       echo "file inside contents: $(cat file_created_inside)"; [[ "$(cat file_created_inside)" != "HELLO INSIDE" ]] && echo "Error: inside file check failed: $(cat file_created_inside)" && RVAL=1
+  #       exit $RVAL
+  #   - name: Check failure propagation from container
+  #     if: success() || failure()
+  #     shell: run-in-container.sh {0}
+  #     run: exit 1
+  #     continue-on-error: true # will pass the job regardless of result
+  #     id: check_propagate_failure
+  #   - name: Check failure propagation from container, part 2 (if not OK)
+  #     shell: bash
+  #     if: ${{ steps.check_propagate_failure.outcome != 'failure' }}
+  #     run: |
+  #       echo "Container step should have failed, but status is not failure"
+  #       exit 1
 
       

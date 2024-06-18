@@ -66,6 +66,7 @@ jobs:
       shell: run-in-container.sh {0}
       id: set_inside
       run: |
+        echo "GITHUB_OUTPUT: $GITHUB_OUTPUT. GITHUB_ENV: $GITHUB_ENV"
         echo "value=I_AM_INSIDE" >> $GITHUB_OUTPUT
         echo "INSIDE_VAR=ENV_INSIDE" >> $GITHUB_ENV
     - name: Check output and env from outside container
@@ -96,7 +97,10 @@ jobs:
     - name: Create a file from inside container
       if: success() || failure()
       shell: run-in-container.sh {0}
-      run: echo "HELLO INSIDE" > file_created_inside
+      run: |
+         set -o xtrace
+         echo "$(pwd)"
+         echo "HELLO INSIDE" > file_created_inside
     - name: Check files outside container
       if: success() || failure()
       shell: bash

@@ -6,6 +6,9 @@ case "$1" in
 	--shell) shell=$2; shift; shift;;
 esac
 
+# Mount the container rootfs
+
+
 # Copy the shell script, if any, into the container at same path
 if [ -f $1 ]; then
     echo "Copying $1 to container"

@@ -23,7 +23,7 @@ jobs:
     - name: Start container
       uses: sandervocke/setup-qemu-container@v1
       with:
-        container: debian:latest
+        container: debian
     - name: Setup Shell Wrapper
       uses: sandervocke/setup-shell-wrapper@v1
     - name: Use container shell

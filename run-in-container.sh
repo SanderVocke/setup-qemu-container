@@ -13,7 +13,6 @@ OUT_FILE=/tmp/_gha_output
 ENV_FILE=/tmp/_gha_env
 
 read -r -d '' unshare_script <<EOF
-  set -o xtrace
   mnt=\$(podman mount $__RUNNING_CONTAINER)
   if [ -f $1 ]; then
     # Copy the shell script, if any, into the container at same path
@@ -25,6 +24,7 @@ read -r -d '' unshare_script <<EOF
   fi
   # Delete past temporary files for GITHUB_OUTPUT and GITHUB_ENV
   if [ ! -z "\$mnt" ]; then
+    echo "Refreshing output and env files"
     rm -f \$mnt/$OUT_FILE && touch \$mnt/$OUT_FILE && chmod a+rw \$mnt/$OUT_FILE
     rm -f \$mnt/$ENV_FILE && touch \$mnt/$ENV_FILE && chmod a+rw \$mnt/$ENV_FILE
   fi

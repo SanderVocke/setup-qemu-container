@@ -100,8 +100,8 @@ jobs:
       run: |
          set -o xtrace
          echo "Current directory: $(pwd)"
-         ls -d -a $(pwd)
-         ls -a /tmp/_gha*
+         ls -d -a -l $(pwd)
+         ls -l -a /tmp/_gha*
          echo "HELLO INSIDE" > file_created_inside
     - name: Check files outside container
       if: success() || failure()

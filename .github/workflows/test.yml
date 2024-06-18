@@ -21,7 +21,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Start container
-      uses: sandervocke/setup-qemu-container@v1
+      uses: ./
       with:
         container: debian
     - name: Setup Shell Wrapper
@@ -33,6 +33,7 @@ jobs:
       shell: wrap-shell {0}
       run: echo "Hello world!"
     - name: Setup tmate session
+      if: success() || failure()
       uses: SanderVocke/action-tmate@master
 
 

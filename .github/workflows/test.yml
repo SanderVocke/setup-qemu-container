@@ -14,30 +14,6 @@ permissions:
 jobs:
 
   test:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Start container
-      uses: ./
-      with:
-        container: debian
-    - name: Setup Shell Wrapper
-      uses: sandervocke/setup-shell-wrapper@v1
-    - name: Use container shell
-      shell: bash
-      run: echo "WRAP_SHELL=run-in-container.sh" >> $GITHUB_ENV
-    - name: Test container shell
-      shell: wrap-shell {0}
-      run: echo "Hello world!"
-    - name: Setup tmate session
-      if: success() || failure()
-      uses: SanderVocke/action-tmate@master
-
-
-  test:
     strategy:
       fail-fast: false
       matrix:

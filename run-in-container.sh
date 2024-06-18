@@ -23,7 +23,7 @@ read -r -d '' unshare_script <<EOF
   podman unmount
 EOF
 echo "$unshare_script"
-podman unshare sh -c "$unshare_script"
+podman unshare bash -x -c "$unshare_script"
 STATUS=$?
 if [ $STATUS -ne 0 ]; then
    echo "Unable to prepare the container filesystem (error code $STATUS)"

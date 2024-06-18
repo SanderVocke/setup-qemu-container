@@ -6,6 +6,9 @@ case "$1" in
 	--shell) shell=$2; shift; shift;;
 esac
 
+# Grant access to container user to workspace
+sudo chmod -R o+rx "$GITHUB_WORKSPACE"
+
 read -r -d '' unshare_script <<EOF
   mnt=\$(podman mount $__RUNNING_CONTAINER)
   if [ -f $1 ]; then

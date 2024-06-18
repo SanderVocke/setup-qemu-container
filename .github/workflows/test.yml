@@ -13,7 +13,7 @@ permissions:
 
 jobs:
 
-  test_user:
+  test:
     strategy:
       fail-fast: false
     steps:
@@ -34,7 +34,7 @@ jobs:
     - name: Setup tmate session
       uses: SanderVocke/action-tmate@master
 
-      
+
   # test:
   #   strategy:
   #     fail-fast: false

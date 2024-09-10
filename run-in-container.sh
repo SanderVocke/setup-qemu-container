@@ -14,9 +14,9 @@ ENV_FILE=/tmp/_gha_env
 RUNTIME_ENV_FILE=/tmp/_gha_run_env
 
 # Propagate our own env by making an env file.
-export -p | grep -v "HOME=" | grep -v "TERM=" > $RUNTIME_ENV_FILE
-echo "declare -x GITHUB_ENV=\"$ENV_FILE\"" >> $RUNTIME_ENV_FILE
-echo "declare -x GITHUB_OUTPUT=\"$OUT_FILE\"" >> $RUNTIME_ENV_FILE
+env | grep -v "HOME=" | grep -v "TERM=" > $RUNTIME_ENV_FILE
+echo "GITHUB_ENV=\"$ENV_FILE\"" >> $RUNTIME_ENV_FILE
+echo "GITHUB_OUTPUT=\"$OUT_FILE\"" >> $RUNTIME_ENV_FILE
 
 read -r -d '' unshare_script <<EOF
   mnt=\$(podman mount $__RUNNING_CONTAINER)

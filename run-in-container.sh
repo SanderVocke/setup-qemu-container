@@ -11,6 +11,12 @@ sudo find "$GITHUB_WORKSPACE" -type d -exec chmod -R o+rwx {} \;
 
 OUT_FILE=/tmp/_gha_output
 ENV_FILE=/tmp/_gha_env
+RUNTIME_ENV_FILE=/tmp/_gha_run_env
+
+# Propagate our own env by making an env file.
+export -p | grep -v "HOME=" | grep -v "TERM=" > $RUNTIME_ENV_FILE
+echo "declare -x GITHUB_ENV=\"$ENV_FILE\"" >> $RUNTIME_ENV_FILE
+echo "declare -x GITHUB_OUTPUT=\"$OUT_FILE\"" >> $RUNTIME_ENV_FILE
 
 read -r -d '' unshare_script <<EOF
   mnt=\$(podman mount $__RUNNING_CONTAINER)
@@ -40,7 +46,7 @@ fi
 # Run the command/script
 cmd="$shell $@"
 echo "Running in container $__RUNNING_CONTAINER: $cmd"
-podman exec -e GITHUB_OUTPUT=$OUT_FILE -e GITHUB_ENV=$ENV_FILE -w $GITHUB_WORKSPACE $__RUNNING_CONTAINER $cmd
+podman exec --env-file=$RUNTIME_ENV_FILE -w $GITHUB_WORKSPACE $__RUNNING_CONTAINER $cmd
 STATUS=$?
 if [ $STATUS -ne 0 ]; then
    echo "Container command failed with code $STATUS"

@@ -28,8 +28,10 @@ jobs:
             container: docker.io/sandervocke/shoopdaloop_run_base_ubuntu_latest_arm64:latest
         args:
           [ null, '--privileged' ]
-          
+
     runs-on: ubuntu-latest
+    env:
+      TEST_GH_ENV: hello
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -81,6 +83,7 @@ jobs:
         echo "LOCAL_OUTSIDE_ENV: $LOCAL_OUTSIDE_ENV"; [[ "${LOCAL_OUTSIDE_ENV}" != "LOCAL OUTSIDE  " ]] && echo "Error: LOCAL_OUTSIDE_ENV check failed: $LOCAL_OUTSIDE_ENV" && RVAL=1
         echo "outside output: ${{ steps.set_outside.outputs.value }}"; [[ "${{ steps.set_outside.outputs.value }}" != "I AM OUTSIDE  " ]] && echo "Error: outside output check failed: ${{ steps.set_outside.outputs.value }}" && RVAL=1
         echo "inside output: ${{ steps.set_inside.outputs.value }}"; [[ "${{ steps.set_inside.outputs.value }}" != "I AM INSIDE  " ]] && echo "Error: inside output check failed: ${{ steps.set_inside.outputs.value }}" && RVAL=1
+        echo "github env: ${{ env.TEST_GH_ENV }}";  [[ "${{ env.TEST_GH_ENV }}" != "hello" ]] && echo "Error: github env var check failed: ${{ env.TEST_GH_ENV }}" && RVAL=1
         exit $RVAL
     - name: Check output and env from inside container
       if: success() || failure()
@@ -89,6 +92,7 @@ jobs:
         RVAL=0
         echo "outside output: ${{ steps.set_outside.outputs.value }}"; [[ "${{ steps.set_outside.outputs.value }}" != "I AM OUTSIDE  " ]] && echo "Error: outside output check failed: ${{ steps.set_outside.outputs.value }}" && RVAL=1
         echo "inside output: ${{ steps.set_inside.outputs.value }}"; [[ "${{ steps.set_inside.outputs.value }}" != "I AM INSIDE  " ]] && echo "Error: inside output check failed: ${{ steps.set_inside.outputs.value }}" && RVAL=1
+        echo "github env: ${{ env.TEST_GH_ENV }}";  [[ "${{ env.TEST_GH_ENV }}" != "hello" ]] && echo "Error: github env var check failed: ${{ env.TEST_GH_ENV }}" && RVAL=1
         exit $RVAL
     - name: Create a file from outside container
       if: success() || failure()
@@ -132,4 +136,3 @@ jobs:
         echo "Container step should have failed, but status is not failure"
         exit 1
 
-      

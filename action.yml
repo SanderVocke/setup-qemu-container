@@ -24,7 +24,7 @@ runs:
     - name: Install packages
       uses: ConorMacBride/install-package@v1
       with:
-        apt: podman qemu qemu-user-static
+        apt: podman qemu-user-static
     - name: Setup
       shell: bash
       run: |

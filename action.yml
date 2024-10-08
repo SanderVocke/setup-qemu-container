@@ -22,9 +22,10 @@ runs:
   using: composite
   steps:
     - name: Install packages
-      uses: ConorMacBride/install-package@v1
-      with:
-        apt: podman qemu-user-static
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y podman qemu-user-static
+      shell: bash
     - name: Setup
       shell: bash
       run: |

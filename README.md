@@ -42,6 +42,7 @@ jobs:
       with:
         container: ${{ matrix.job.container }}
         arch: ${{ matrix.job.arch }}
+        initial_delay: 30s
 
     - name: Setup Shell Wrapper
       uses: sandervocke/setup-shell-wrapper@v1

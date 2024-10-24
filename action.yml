@@ -17,6 +17,10 @@ inputs:
   podman_args:
     description: >
       Additional arguments to podman.
+  initial_delay:
+    description: >
+      Time to wait for pod to be available, e.g., 500ms, 30s, 5m.
+    default: 5m
 
 runs:
   using: composite
@@ -49,7 +53,7 @@ runs:
       with:
         run: $PODMAN_CMD
         wait-on: ${{ github.action_path }}/container_cid
-        wait-for: 5m
+        wait-for: ${{ inputs.initial_delay }}
         log-output-resume: true
     - name: Get CID
       shell: bash

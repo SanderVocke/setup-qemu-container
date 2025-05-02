@@ -18,13 +18,14 @@ env | grep -v "HOME=" | grep -v "TERM=" > $RUNTIME_ENV_FILE
 
 read -r -d '' unshare_script <<EOF
   mnt=\$(podman mount $__RUNNING_CONTAINER)
-  if [ -f $1 ]; then
+  last_arg=${@: -1}
+  if [ -f $last_arg ]; then
     # Copy the shell script, if any, into the container at same path
-    echo "Copying $1 to container"
-    mkdir -p \$mnt/$(dirname $1)
-    chmod a+rwx \$mnt/$(dirname $1)
-    cp $1 \$mnt/$1
-    chmod a+x \$mnt/$1
+    echo "Copying $last_arg to container"
+    mkdir -p \$mnt/$(dirname $last_arg)
+    chmod a+rwx \$mnt/$(dirname $last_arg)
+    cp $last_arg \$mnt/$last_arg
+    chmod a+x \$mnt/$last_arg
   fi
   # Delete past temporary files for GITHUB_OUTPUT and GITHUB_ENV
   if [ ! -z "\$mnt" ]; then

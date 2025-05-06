@@ -3,8 +3,13 @@
 # Allow overriding with a custom shell inside the container
 shell="/bin/sh"
 case "$1" in
-	--shell) shell=$2; shift; shift;;
+	--shell) shell="$2"; shift; shift;;
 esac
+
+if [ -n "$__SETUP_EMU_CONTAINER_VERBOSE" ]; then
+  echo "setup-qemu-container: shell: $shell"
+  echo "setup-qemu-container: args: $@"
+fi
 
 # Grant access to container user to workspace
 sudo find "$GITHUB_WORKSPACE" -type d -exec chmod -R o+rwx {} \;

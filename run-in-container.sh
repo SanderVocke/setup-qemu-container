@@ -20,7 +20,9 @@ read -r -d '' unshare_script <<EOF
   mnt=\$(podman mount $__RUNNING_CONTAINER)
   if [ -f $1 ]; then
     # Copy the shell script, if any, into the container at same path
-    echo "Copying $1 to container"
+    if [ ! -z "$__SETUP_EMU_CONTAINER_VERBOSE" ]; then
+      echo "setup-qemu-container: Copying $1 to container"
+    fi
     mkdir -p \$mnt/$(dirname $1)
     chmod a+rwx \$mnt/$(dirname $1)
     cp $1 \$mnt/$1
@@ -28,26 +30,34 @@ read -r -d '' unshare_script <<EOF
   fi
   # Delete past temporary files for GITHUB_OUTPUT and GITHUB_ENV
   if [ ! -z "\$mnt" ]; then
-    echo "Refreshing output and env files"
+    if [ ! -z "$__SETUP_EMU_CONTAINER_VERBOSE" ]; then
+      echo "setup-qemu-container: Refreshing output and env files"
+    fi
     rm -f \$mnt/$OUT_FILE && touch \$mnt/$OUT_FILE && chmod a+rw \$mnt/$OUT_FILE
     rm -f \$mnt/$ENV_FILE && touch \$mnt/$ENV_FILE && chmod a+rw \$mnt/$ENV_FILE
   fi
   podman unmount $__RUNNING_CONTAINER
 EOF
+if [ ! -z "$__SETUP_EMU_CONTAINER_VERBOSE" ]; then
+  echo "setup-qemu-container: Running podman unshare script:"
+  echo "$unshare_script"
+fi
 podman unshare bash -c "$unshare_script"
 STATUS=$?
 if [ $STATUS -ne 0 ]; then
-   echo "Unable to prepare the container filesystem (error code $STATUS)"
+   echo "setup-qemu-container: Unable to prepare the container filesystem (error code $STATUS)"
    exit 1
 fi
 
 # Run the command/script
 cmd="$shell $@"
-echo "Running in container $__RUNNING_CONTAINER: $cmd"
+if [ ! -z "$__SETUP_EMU_CONTAINER_VERBOSE" ]; then
+  echo "setup-qemu-container: Running in container $__RUNNING_CONTAINER: $cmd"
+fi
 podman exec --env-file=$RUNTIME_ENV_FILE -e GITHUB_OUTPUT=$OUT_FILE -e GITHUB_ENV=$ENV_FILE -w $GITHUB_WORKSPACE $__RUNNING_CONTAINER $cmd
 STATUS=$?
 if [ $STATUS -ne 0 ]; then
-   echo "Container command failed with code $STATUS"
+   echo "setup-qemu-container: Container command failed with code $STATUS"
    exit 1
 fi
 

@@ -43,6 +43,7 @@ jobs:
         container: ${{ matrix.job.container }}
         arch: ${{ matrix.job.arch }}
         podman_args: ${{ matrix.args }}
+        verbose: true
     - name: Inspect container
       if: success() || failure()
       shell: bash

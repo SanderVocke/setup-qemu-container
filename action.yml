@@ -21,6 +21,10 @@ inputs:
     description: >
       Time to wait for pod to be available, e.g., 500ms, 30s, 5m.
     default: 5m
+  verbose:
+    description: >
+      Whether to enable verbose logging.
+    default: false
 
 runs:
   using: composite
@@ -42,6 +46,10 @@ runs:
          ARCH_ARGS=""
          if [ ! -z "${{ inputs.arch }}" ]; then
            ARCH_ARGS="--arch ${{ inputs.arch }}"
+         fi
+         if [ "${{ inputs.verbose }}" = "true" ]; then
+            echo "setup-qemu-container: Verbose logging enabled"
+            echo "__SETUP_EMU_CONTAINER_VERBOSE=true" >> $GITHUB_ENV
          fi
          ARGS="$ARGS $ARCH_ARGS ${{ inputs.podman_args }}"
          podman pull $ARCH_ARGS ${{ inputs.container }}

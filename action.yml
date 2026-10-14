@@ -57,7 +57,7 @@ runs:
          echo "Full podman command: $CMD"
          echo "PODMAN_CMD=$CMD" >> $GITHUB_ENV
     - name: Run container
-      uses: JarvusInnovations/background-action@v1
+      uses: JarvusInnovations/background-action@2428e7b970a846423095c79d43f759abf979a635 # v1
       with:
         run: $PODMAN_CMD
         wait-on: ${{ github.action_path }}/container_cid
